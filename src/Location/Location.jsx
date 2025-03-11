@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react"
+import {MapContainer, TileLayer, Marker, Popup} from "react-leaflet"
 
 
 const Location = () => {
@@ -27,6 +28,7 @@ const Location = () => {
                 setLocate(loc)
             } catch (error) {
                 console.error(`Error in geolocation please try again after some time ${error}`);
+                alert(`Geolocation is not supported`)
 
             }
         }
@@ -35,6 +37,7 @@ const Location = () => {
     return (
         <div>
             {locate ? <p>Latitude: {locate[0]}, Longitude: {locate[1]}</p> : <p>Loading...</p>}
+
         </div>
     )
 }
