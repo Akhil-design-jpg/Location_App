@@ -49,7 +49,7 @@ const Location = () => {
         let phoneNumber = "+917876832723"
         let apilayer2 = "f46d0a34dd686d56d39e161ff21c2140"
       try {
-            let response2 = await fetch(`http://apilayer.net/api/validate?access_key=${apilayer2}&number=${phoneNumber}`
+            let response2 = await fetch(`https://apilayer.net/api/validate?access_key=${apilayer2}&number=${phoneNumber}`
             )   
             let data2 = await response2.json()
             console.log(data2);
