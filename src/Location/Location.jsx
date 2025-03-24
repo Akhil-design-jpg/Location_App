@@ -3,69 +3,101 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const Location = () => {
-    const [locate, setLocate] = useState(null);
+    const [position, setPosition] = useState(null)
+    const [phoneinfo, setPhoneInfo] = useState(null)
 
-    async function getPhonelocation() {
-        let phoneNumber = "7876832723";
-        let apikey = import.meta.env.VITE_API_KEY; // Updated API key
+    const geolocation = async () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((pos) => {
+                let latitude = pos.coords.latitude
+                let longitude = pos.coords.longitude
+                setPosition([latitude, longitude]),
+                    { enableHighAccuracy: true }
 
-        let url = `https://api.apilayer.com/number_verification/validate?access_key=${apikey}&number=${phoneNumber}`;
-
-        try {
-            let response = await fetch(url);
-            let data = await response.json();
-            console.log(data);
-
-            if (data.valid) {
-                alert(`Country: ${data.country_name}, Carrier: ${data.carrier}`);
-                getCountryCoords(data.country_name); // Get country coordinates
-            } else {
-                alert("Invalid phone number!");
+                // leaflet requries array format
+                // latitude and then longitude default syntax
+            }, (error) => {
+                console.error("Not supported ", error);
+                // getIplocation()
             }
-        } catch (error) {
-            alert("Error fetching phone location. Please try again later.");
-            console.error("Fetch Error:", error);
+
+            )
         }
+        else {
+            console.error("Something went wrong , please try again")
+            // getIplocation(); // runs only when gps doesnot work properly
+        }
+
+
+
+
+
+
+
     }
 
-    async function getCountryCoords(countryName) {
-        let geoCodeApiKey = import.meta.env.VITE_GEO_CODE_API; // Updated API key
-        let geoUrl = `https://api.opencagedata.com/geocode/v1/json?q=${countryName}&key=${geoCodeApiKey}`;
+    const getIplocation = async () => {
+        let apiKey = "c0f5ce5239c24a4c9790726f55ade21b"
+        let response = await fetch(`https://api.ipgeolocation.io/ipgeo?apiKey=${apiKey}`)
+        let data = await response.json()
+        setPosition([data.latitude, data.longitude])
 
-        try {
-            let response = await fetch(geoUrl);
-            let data = await response.json();
-            console.log(data);
-
-            if (data.results.length > 0) {
-                let { lat, lng } = data.results[0].geometry; // Destructuring
-                setLocate([lat, lng]); // Set coordinates in state
-            } else {
-                alert("Unable to find location for this country");
-            }
-        } catch (error) {
-            console.error("Error fetching country location:", error);
-        }
     }
 
-    useEffect(() => {
-        getPhonelocation();
-    }, []); // Run once when the component mounts
+    const getPhonelocation = async () => {
+
+        let phoneNumber = "+917876832723"
+        let apilayer2 = "f46d0a34dd686d56d39e161ff21c2140"
+      try {
+            let response2 = await fetch(`http://apilayer.net/api/validate?access_key=${apilayer2}&number=${phoneNumber}`
+            )   
+            let data2 = await response2.json()
+            console.log(data2);
+            setPhoneInfo(data2)
+            
+      } catch (error) {
+            console.log('Some error occured', error);
+            geolocation() // fallback to geolocation when Iplocation is not working 
+            
+      }
+    }
+
 
     return (
-        <div>
-            <button onClick={getPhonelocation}>Get phone location</button>
+        <>
+            <div>
+                <button onClick={getIplocation}>
+                    Get location
+                </button>
+                <button onClick={getPhonelocation}>
+                    get phone location
+                </button>
 
-            {locate && (
-                <MapContainer center={locate} zoom={6} style={{ height: "480px", width: "480px" }}>
-                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <Marker position={locate}>
-                        <Popup>You are here!</Popup>
-                    </Marker>
-                </MapContainer>
-            )}
-        </div>
-    );
+                {phoneinfo && (
+                    <div>
+                        <h2>Phone number info</h2>
+                        <p><strong>Valid: </strong>{phoneinfo.valid ? "Yes" : "No"}</p>
+                        <p><strong>Number </strong>{phoneinfo.number}</p>
+                        <p><strong>Country: </strong>{phoneinfo.country_name}</p>
+                        <p><strong>Carrier: </strong>{phoneinfo.carrier}</p>
+                    </div>
+                )}
+
+                {position && (
+                    <MapContainer center={position} zoom={13} style={{ height: "800px", width: "800px", marginTop: "20px" }}>
+                        <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        />
+                        <Marker position={position}>
+                            <Popup>You are here!</Popup>
+                        </Marker>
+                    </MapContainer>
+                )}
+            </div>
+        </>
+    )
+
 };
 
 export default Location;
