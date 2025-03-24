@@ -94,6 +94,8 @@ const Location = () => {
         <button onClick={getIplocation}>Get location</button>
         <button onClick={getPhonelocation}>get phone details</button>
         <button onClick={shareLocation}>Copy your location</button>
+        <button onClick={shareViaWhatsapp}>Share via whatsApp</button>
+
 
         {phoneinfo && (
           <div>
